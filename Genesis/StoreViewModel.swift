@@ -7,6 +7,9 @@
 
 import SwiftUI
 
+
+
+
 class StoreViewModel: ObservableObject {
     @Published var products: [Product] = [
         Product(name: "Laptop", price: 1200.0, description: "A powerful laptop for work and play with top-notch performance.", imageName: "laptopcomputer", availableColors: ["Red", "Green", "Black"]),
@@ -15,6 +18,8 @@ class StoreViewModel: ObservableObject {
     ]
     
     @Published var cartItems: [CartItem] = []
+    
+    @Published var favItem: [Product] = []
     
     func addToCart(product: Product, selectedColor: String) -> Bool {
         if let index = cartItems.firstIndex(where: { $0.product.id == product.id && $0.selectedColor == selectedColor }) {

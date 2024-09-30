@@ -6,7 +6,29 @@ struct ProductDetailView: View {
     
     @State private var selectedColor: String = ""
     @State private var showAlert: Bool = false
+    @State private var showFavAlert: Bool = false
+    @State private var isShareSheetPresented: Bool = false
     @State private var alertMessage: String = ""
+    
+    @State private var alertFavMessage: String = "Added to favorites"
+    
+    @State private var isFav: Bool = false
+    
+    
+    
+    func generateShareableProductString(for product: Product) -> String {
+        """
+        Check out this product:
+        
+        🛍️ **Product Name**: \(product.name)
+        
+        📃 **Description**: \(product.description)
+        
+        💰 **Price**: $\(String(format: "%.2f", product.price))
+        
+        """
+    }
+
     
     var body: some View {
         VStack {
@@ -44,6 +66,49 @@ struct ProductDetailView: View {
             .padding(.horizontal)
             
             // Add to Cart Button
+            
+            
+            
+            HStack {
+                Button(action: {
+                    
+                    isShareSheetPresented = true
+                    
+                }) {
+                    Image(systemName: "square.and.arrow.up.fill")
+                        .font(.system(size: 25))
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+                
+                Button(action: {
+                    
+                  //  self.product.isFavourite.toggle()
+                    isFav.toggle()
+                    
+                    if isFav {
+                        viewModel.favItem.append(product)
+                        showFavAlert.toggle()
+                    }else {
+                        viewModel.favItem.removeAll(where: { $0.name == product.name })
+
+                    }
+                    
+                }) {
+                    Image(systemName:  isFav ? "heart.fill" : "heart")
+                        .font(.system(size: 25))
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+               
+            }
+            
             Button(action: {
                 if selectedColor.isEmpty {
                     alertMessage = "Please select a color before adding to the cart."
@@ -74,6 +139,13 @@ struct ProductDetailView: View {
         .alert(isPresented: $showAlert) {
             Alert(title: Text("Cart"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
+        .alert(isPresented: $showFavAlert) {
+            Alert(title: Text("Favorite"), message: Text(alertFavMessage), dismissButton: .default(Text("OK")))
+        }
+        .sheet(isPresented: $isShareSheetPresented, content: {
+            ShareSheet(items: [generateShareableProductString(for: product)])
+                    })
+        
     }
 }
 
@@ -102,4 +174,9 @@ struct ColorCircle: View {
         default: return .gray
         }
     }
+}
+
+
+#Preview {
+    ProductDetailView(viewModel: StoreViewModel(), product: StoreViewModel().products.first! )
 }
